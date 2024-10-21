@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Login - Minha Despensa</title>
+    <link rel="stylesheet" th:href="@{/estilo.css}">
+    <link rel="icon" th:href="@{/favicon.ico}" type="image/x-icon">
+</head>
+<body>
+    <div class="centered-form">
+        <form th:action="@{/login}" method="post">
+            <h1>Login</h1>
+            <label for="email">Email:</label>
+            <input type="email" id="email" name="username" required>
+
+            <label for="senha">Senha:</label>
+            <input type="password" id="senha" name="password" required>
+
+            <button type="submit">Entrar</button>
+
+            <!-- Link para a tela de cadastro logo abaixo do botão "Entrar" -->
+            <a th:href="@{/usuario/cadastro}">Criar Usuário</a>
+        </form>
+    </div>
+</body>
+</html>

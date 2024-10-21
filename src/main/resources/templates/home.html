@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <meta charset="UTF-8">
+        <title>Painel - Minha Despensa</title>
+        <link rel="stylesheet" th:href="@{/estilo.css}">
+        <script src="https://cdn.jsdelivr.net/npm/whatwg-fetch@3.6.2/dist/fetch.umd.js"></script>
+        <script th:src="@{/Script.js}"></script>
+        <link rel="icon" th:href="@{/favicon.ico}" type="image/x-icon">
+    </head>
+    <body>
+        <h1>Bem-vindo(a) à sua Despensa!</h1>
+
+        <div class="container">
+            <!-- Primeira linha: Produtos -->
+            <div class="row">
+                <div class="col">
+                    <h2>Cadastrar Produto</h2>
+                    <form th:action="@{/produtos/salvar}" th:object="${produto}" method="post">
+                        <label for="nomeProduto">Nome do Produto:</label>
+                        <input type="text" id="nomeProduto" th:field="*{nome}" required><br>
+
+                        <label for="porcao">Porção de Referência:</label>
+                        <input type="number" id="porcao" th:field="*{porcaoReferencia}" required><br>
+
+                        <label for="proteinas">Proteínas:</label>
+                        <input type="number" id="proteinas" th:field="*{proteinas}" required><br>
+
+                        <label for="carboidratos">Carboidratos:</label>
+                        <input type="number" id="carboidratos" th:field="*{carboidratos}" required><br>
+
+                        <label for="calorias">Calorias:</label>
+                        <input type="number" id="calorias" th:field="*{calorias}" required><br>
+
+                        <label for="gorduras">Gorduras Totais:</label>
+                        <input type="number" id="gorduras" th:field="*{gordurasTotais}" required><br>
+
+                        <button type="submit">Cadastrar Produto</button>
+                    </form>
+                </div>
+
+                <div class="col">
+                    <h2>Lista de Produtos</h2>
+                    <ul>
+                        <li th:each="produto : ${produtos}">
+                            <a href="#" th:text="${produto.nome}" th:onclick="'showProduto(' + ${produto.id} + ')'"></a>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="col">
+                    <h2>Informações do Produto</h2>
+                    <div th:if="${produtoSelecionado != null}">
+                        <p>Nome: <span th:text="${produtoSelecionado.nome}"></span></p>
+                        <p>Porção de Referência: <span th:text="${produtoSelecionado.porcaoReferencia}"></span></p>
+                        <p>Proteínas: <span th:text="${produtoSelecionado.proteinas}"></span></p>
+                        <p>Carboidratos: <span th:text="${produtoSelecionado.carboidratos}"></span></p>
+                        <p>Calorias: <span th:text="${produtoSelecionado.calorias}"></span></p>
+                        <p>Gorduras Totais: <span th:text="${produtoSelecionado.gordurasTotais}"></span></p>
+                        <button th:onclick="'editProduto(' + ${produtoSelecionado.id} + ')'">Editar</button>
+                        <button th:onclick="'deleteProduto(' + ${produtoSelecionado.id} + ')'">Excluir</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Segunda linha: Receitas -->
+            <div class="row">
+                <div class="col">
+                    <h2>Cadastrar Receita</h2>
+                    <form th:action="@{/receitas/salvar}" th:object="${receita}" method="post">
+                        <label for="nomeReceita">Nome da Receita:</label>
+                        <input type="text" id="nomeReceita" th:field="*{nome}" required><br>
+
+                        <!-- Campos para adicionar ingredientes -->
+                        <div th:each="produto : ${produtos}">
+                            <label th:for="'produto' + ${produto.id}" th:text="${produto.nome}"></label>
+                            <input type="number" th:field="*{ingredientes[${produto.id}]}" placeholder="Quantidade"><br>
+                        </div>
+
+                        <label for="modoPreparo">Modo de Preparo:</label>
+                        <textarea id="modoPreparo" th:field="*{modoPreparo}" required></textarea><br>
+
+                        <button type="submit">Cadastrar Receita</button>
+                    </form>
+                </div>
+
+                <div class="col">
+                    <h2>Lista de Receitas</h2>
+                    <ul>
+                        <li th:each="receita : ${receitas}">
+                            <a href="#" th:text="${receita.nome}" th:onclick="'showReceita(' + ${receita.id} + ')'"></a>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="col">
+                    <h2>Informações da Receita</h2>
+                    <div th:if="${receitaSelecionada != null}">
+                        <p>Nome: <span th:text="${receitaSelecionada.nome}"></span></p>
+                        <p>Ingredientes:</p>
+                        <ul>
+                            <li th:each="ingrediente : ${receitaSelecionada.ingredientes}">
+                                <span th:text="${ingrediente.produto.nome}"></span>: <span th:text="${ingrediente.quantidade}"></span>
+                            </li>
+                        </ul>
+                        <p>Modo de Preparo: <span th:text="${receitaSelecionada.modoPreparo}"></span></p>
+                        <button th:onclick="'editReceita(' + ${receitaSelecionada.id} + ')'">Editar</button>
+                        <button th:onclick="'deleteReceita(' + ${receitaSelecionada.id} + ')'">Excluir</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>
