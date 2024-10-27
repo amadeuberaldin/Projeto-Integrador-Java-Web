@@ -6,13 +6,20 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.csrf.HttpSessionCsrfTokenRepository;
 
 @Configuration
 public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        HttpSessionCsrfTokenRepository csrfTokenRepository = new HttpSessionCsrfTokenRepository();
+        csrfTokenRepository.setSessionAttributeName("_csrf");
+
         http
+                .csrf(csrf -> csrf
+                .csrfTokenRepository(csrfTokenRepository)
+                )
                 .authorizeHttpRequests((requests) -> requests
                 .requestMatchers("/login", "/register", "/usuario/cadastro", "/usuario/salvar", "/estilo.css", "/favicon.ico", "/Script.js").permitAll()
                 .anyRequest().authenticated()
@@ -26,7 +33,7 @@ public class SecurityConfig {
                 .logoutSuccessUrl("/login?logout")
                 .permitAll()
                 );
-
+        
         return http.build();
     }
 

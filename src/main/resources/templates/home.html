@@ -3,10 +3,12 @@
     <head>
         <meta charset="UTF-8">
         <title>Painel - Minha Despensa</title>
+        <link rel="icon" th:href="@{/favicon.ico}" type="image/x-icon">
         <link rel="stylesheet" th:href="@{/estilo.css}">
         <script src="https://cdn.jsdelivr.net/npm/whatwg-fetch@3.6.2/dist/fetch.umd.js"></script>
         <script th:src="@{/Script.js}"></script>
-        <link rel="icon" th:href="@{/favicon.ico}" type="image/x-icon">
+        <meta name="_csrf" th:content="${_csrf.token}">
+        <meta name="_csrf_header" th:content="${_csrf.headerName}">
     </head>
     <body>
         <h1>Bem-vindo(a) à sua Despensa!</h1>
@@ -39,30 +41,52 @@
                     </form>
                 </div>
 
+                <!-- Lista de Produtos (Coluna 2) -->
                 <div class="col">
                     <h2>Lista de Produtos</h2>
-                    <ul>
-                        <li th:each="produto : ${produtos}">
-                            <a href="#" th:text="${produto.nome}" th:onclick="'showProduto(' + ${produto.id} + ')'"></a>
-                        </li>
-                    </ul>
-                </div>
-
-                <div class="col">
-                    <h2>Informações do Produto</h2>
-                    <div th:if="${produtoSelecionado != null}">
-                        <p>Nome: <span th:text="${produtoSelecionado.nome}"></span></p>
-                        <p>Porção de Referência: <span th:text="${produtoSelecionado.porcaoReferencia}"></span></p>
-                        <p>Proteínas: <span th:text="${produtoSelecionado.proteinas}"></span></p>
-                        <p>Carboidratos: <span th:text="${produtoSelecionado.carboidratos}"></span></p>
-                        <p>Calorias: <span th:text="${produtoSelecionado.calorias}"></span></p>
-                        <p>Gorduras Totais: <span th:text="${produtoSelecionado.gordurasTotais}"></span></p>
-                        <button th:onclick="'editProduto(' + ${produtoSelecionado.id} + ')'">Editar</button>
-                        <button th:onclick="'deleteProduto(' + ${produtoSelecionado.id} + ')'">Excluir</button>
+                    <div style="max-height: 450px; overflow-y: auto;">
+                        <table>
+                            <tbody>
+                                <tr th:each="produto : ${produtos}" th:onclick="|showProduto(${produto.id})|" style="cursor: pointer;">
+                                    <td th:text="${produto.nome}"></td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
-            </div>
 
+                <!-- Detalhes do Produto Selecionado (Coluna 3) -->
+                <div class="col col-produto-info">
+                    <h2>Informações do Produto</h2>
+                    <div id="produto-detalhes"></div>
+                </div>
+            </div>
+            <!-- Div para o pop-up de edição -->
+            <div id="edit-popup" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #fff; padding: 20px; border: 1px solid #ccc; z-index: 1000;">
+                <h3>Editar Produto</h3>
+                <form id="edit-form">
+                    <label for="edit-nome">Nome:</label>
+                    <input type="text" id="edit-nome" required><br>
+
+                    <label for="edit-porcao">Porção de Referência:</label>
+                    <input type="number" id="edit-porcao" required><br>
+
+                    <label for="edit-proteinas">Proteínas:</label>
+                    <input type="number" id="edit-proteinas" required><br>
+
+                    <label for="edit-carboidratos">Carboidratos:</label>
+                    <input type="number" id="edit-carboidratos" required><br>
+
+                    <label for="edit-calorias">Calorias:</label>
+                    <input type="number" id="edit-calorias" required><br>
+
+                    <label for="edit-gorduras">Gorduras Totais:</label>
+                    <input type="number" id="edit-gorduras" required><br>
+
+                    <button type="button" onclick="saveEdits()">Salvar Alterações</button>
+                    <button type="button" onclick="closeEditPopup()">Cancelar</button>
+                </form>
+            </div>
             <!-- Segunda linha: Receitas -->
             <div class="row">
                 <div class="col">
@@ -74,7 +98,7 @@
                         <!-- Campos para adicionar ingredientes -->
                         <div th:each="produto : ${produtos}">
                             <label th:for="'produto' + ${produto.id}" th:text="${produto.nome}"></label>
-                            <input type="number" th:field="*{ingredientes[${produto.id}]}" placeholder="Quantidade"><br>
+                            <input type="number" th:name="ingredientes[__${produto.id}__]" placeholder="Quantidade" th:attr="id='produto' + ${produto.id}"><br>
                         </div>
 
                         <label for="modoPreparo">Modo de Preparo:</label>
@@ -84,29 +108,28 @@
                     </form>
                 </div>
 
+                <!-- Lista de Receitas (Coluna 2) -->
                 <div class="col">
                     <h2>Lista de Receitas</h2>
-                    <ul>
-                        <li th:each="receita : ${receitas}">
-                            <a href="#" th:text="${receita.nome}" th:onclick="'showReceita(' + ${receita.id} + ')'"></a>
-                        </li>
-                    </ul>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Nome</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:each="receita : ${receitas}" onclick="showReceita([[${receita.id}]])" style="cursor: pointer;">
+                                <td th:text="${receita.nome}"></td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
 
-                <div class="col">
+                <!-- Detalhes da Receita Selecionada (Coluna 3) -->
+                <div class="col col-receita-info">
                     <h2>Informações da Receita</h2>
-                    <div th:if="${receitaSelecionada != null}">
-                        <p>Nome: <span th:text="${receitaSelecionada.nome}"></span></p>
-                        <p>Ingredientes:</p>
-                        <ul>
-                            <li th:each="ingrediente : ${receitaSelecionada.ingredientes}">
-                                <span th:text="${ingrediente.produto.nome}"></span>: <span th:text="${ingrediente.quantidade}"></span>
-                            </li>
-                        </ul>
-                        <p>Modo de Preparo: <span th:text="${receitaSelecionada.modoPreparo}"></span></p>
-                        <button th:onclick="'editReceita(' + ${receitaSelecionada.id} + ')'">Editar</button>
-                        <button th:onclick="'deleteReceita(' + ${receitaSelecionada.id} + ')'">Excluir</button>
-                    </div>
+                    <!-- Detalhes da receita serão carregados aqui -->
+                    <div id="receita-detalhes"></div>
                 </div>
             </div>
         </div>
