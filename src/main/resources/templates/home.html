@@ -95,34 +95,40 @@
                         <label for="nomeReceita">Nome da Receita:</label>
                         <input type="text" id="nomeReceita" th:field="*{nome}" required><br>
 
-                        <!-- Campos para adicionar ingredientes -->
-                        <div th:each="produto : ${produtos}">
-                            <label th:for="'produto' + ${produto.id}" th:text="${produto.nome}"></label>
-                            <input type="number" th:name="ingredientes[__${produto.id}__]" placeholder="Quantidade" th:attr="id='produto' + ${produto.id}"><br>
+                        <!-- Seção para ingredientes dinâmicos -->
+                        <div id="ingredientes-container">
+                            <label>Ingredientes:</label>
+                            <div class="ingrediente-row">
+                                <select name="ingredientes[0].produtoId" class="produto-select" required>
+                                    <option value="" disabled selected>Selecione um produto</option>
+                                    <option th:each="produto : ${produtos}" th:value="${produto.id}" th:text="${produto.nome}"></option>
+                                </select>
+                                <input type="number" name="ingredientes[0].quantidade" placeholder="Quantidade" required>
+                                <span>g</span>
+                            </div>
                         </div>
+                        <button type="button" onclick="adicionarIngrediente()">+ Adicionar Ingrediente</button>
 
                         <label for="modoPreparo">Modo de Preparo:</label>
                         <textarea id="modoPreparo" th:field="*{modoPreparo}" required></textarea><br>
 
-                        <button type="submit">Cadastrar Receita</button>
+                        <button type="button" onclick="submitRecipe()">Cadastrar Receita</button>
                     </form>
+
                 </div>
 
                 <!-- Lista de Receitas (Coluna 2) -->
                 <div class="col">
-                    <h2>Lista de Receitas</h2>
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Nome</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr th:each="receita : ${receitas}" onclick="showReceita([[${receita.id}]])" style="cursor: pointer;">
-                                <td th:text="${receita.nome}"></td>
-                            </tr>
-                        </tbody>
-                    </table>
+                    <h2>Lista de Receitas</h2>                    
+                    <div style="max-height: 450px; overflow-y: auto;">
+                        <table>
+                            <tbody>
+                                <tr th:each="receita : ${receitas}" onclick="showReceita([[${receita.id}]])" style="cursor: pointer;">
+                                    <td th:text="${receita.nome}"></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
 
                 <!-- Detalhes da Receita Selecionada (Coluna 3) -->
@@ -131,6 +137,18 @@
                     <!-- Detalhes da receita serão carregados aqui -->
                     <div id="receita-detalhes"></div>
                 </div>
+            </div>
+        </div>
+
+        <!-- Elemento invisível para servir como template dos ingredientes -->
+        <div id="ingrediente-template" style="display: none;">
+            <div class="ingrediente-row">
+                <select name="ingredientes[INDEX].produtoId" class="produto-select" required>
+                    <option value="" disabled selected>Selecione um produto</option>
+                    <option th:each="produto : ${produtos}" th:value="${produto.id}" th:text="${produto.nome}"></option>
+                </select>
+                <input type="number" name="ingredientes[INDEX].quantidade" placeholder="Quantidade" required>
+                <span>g</span>
             </div>
         </div>
     </body>

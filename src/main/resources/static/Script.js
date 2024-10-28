@@ -114,7 +114,7 @@ async function deleteItem(type, id) {
             const csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttribute("content");
 
             // Atualiza a URL para usar o caminho correto
-            const response = await fetch(`/${type}s/${id}`, { // 's' após type para pluralidade (produtos ou receitas)
+            const response = await fetch(`/${type}s/${id}`, {// 's' após type para pluralidade (produtos ou receitas)
                 method: 'DELETE',
                 headers: {
                     [csrfHeader]: csrfToken // Insere o token CSRF no cabeçalho
@@ -179,4 +179,59 @@ if (form) {
                 })
                 .catch(error => alert("Erro ao salvar o produto: " + error.message));
     });
+}
+
+let ingredienteIndex = 1;
+
+function adicionarIngrediente() {
+    const container = document.getElementById('ingredientes-container');
+    const template = document.getElementById('ingrediente-template').innerHTML;
+
+    // Substitui 'INDEX' pelo índice atual
+    const novoIngredienteHtml = template.replace(/INDEX/g, ingredienteIndex);
+    const novoIngrediente = document.createElement('div');
+    novoIngrediente.innerHTML = novoIngredienteHtml;
+
+    // Adiciona o novo ingrediente ao container
+    container.appendChild(novoIngrediente);
+    ingredienteIndex++;
+}
+
+async function submitRecipe() {
+    const nomeReceita = document.getElementById('nomeReceita').value;
+    const modoPreparo = document.getElementById('modoPreparo').value;
+
+    const ingredientes = Array.from(document.querySelectorAll('.ingrediente-row')).map(row => ({
+            produtoId: row.querySelector('.produto-select').value,
+            quantidade: row.querySelector('input[type="number"]').value
+        }));
+
+    const receitaData = {
+        nome: nomeReceita,
+        modoPreparo: modoPreparo,
+        ingredientes: ingredientes
+    };
+
+    const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute("content");
+    const csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttribute("content");
+
+    try {
+        const response = await fetch('/receitas/salvar', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                [csrfHeader]: csrfToken
+            },
+            body: JSON.stringify(receitaData)
+        });
+
+        if (response.ok) {
+            alert("Receita cadastrada com sucesso!");
+            window.location.reload();
+        } else {
+            throw new Error("Erro ao cadastrar a receita.");
+        }
+    } catch (error) {
+        alert("Erro ao cadastrar a receita: " + error.message);
+    }
 }
