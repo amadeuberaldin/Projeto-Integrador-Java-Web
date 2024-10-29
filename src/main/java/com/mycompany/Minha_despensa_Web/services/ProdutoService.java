@@ -1,5 +1,6 @@
 package com.mycompany.Minha_despensa_Web.services;
 
+import com.mycompany.Minha_despensa_Web.entities.DTO.ProdutoDTO.ProdutoProjection;
 import com.mycompany.Minha_despensa_Web.entities.Produto;
 import com.mycompany.Minha_despensa_Web.repositories.ProdutoRepository;
 import java.util.List;
@@ -30,5 +31,9 @@ public class ProdutoService {
 
     public Produto findById(Long id) {
         return produtoRepository.findById(id).orElse(null);
+    }
+
+    public ProdutoProjection findProdutoProjectionById(Long id) {
+        return produtoRepository.findProdutoById(id);
     }
 }

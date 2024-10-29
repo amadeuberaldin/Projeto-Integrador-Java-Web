@@ -1,5 +1,7 @@
 package com.mycompany.Minha_despensa_Web.controllers;
 
+import com.mycompany.Minha_despensa_Web.entities.DTO.ProdutoDTO;
+import com.mycompany.Minha_despensa_Web.entities.DTO.ProdutoDTO.ProdutoProjection;
 import com.mycompany.Minha_despensa_Web.entities.Produto;
 import com.mycompany.Minha_despensa_Web.entities.Usuario;
 import com.mycompany.Minha_despensa_Web.services.ProdutoService;
@@ -27,7 +29,7 @@ public class ProdutoController {
     private ProdutoService produtoService;
 
     @Autowired
-    private UsuarioService usuarioService; // Injetando o UsuarioService
+    private UsuarioService usuarioService;
 
     @PostMapping("/salvar")
     public String salvarProduto(@ModelAttribute Produto produto, RedirectAttributes redirectAttributes) {
@@ -59,10 +61,10 @@ public class ProdutoController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Produto> getProdutoById(@PathVariable Long id) {
-        Produto produto = produtoService.findById(id);
-        if (produto != null) {
-            return ResponseEntity.ok(produto);
+    public ResponseEntity<ProdutoProjection> getProdutoById(@PathVariable Long id) {
+        ProdutoProjection produtoProjection = produtoService.findProdutoProjectionById(id);
+        if (produtoProjection != null) {
+            return ResponseEntity.ok(produtoProjection);
         } else {
             return ResponseEntity.notFound().build();
         }
@@ -88,5 +90,4 @@ public class ProdutoController {
             return ResponseEntity.notFound().build();
         }
     }
-
 }

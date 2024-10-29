@@ -28,19 +28,19 @@ public class Produto {
     private String nome;
 
     @Column(name = "porcao_referencia", nullable = false)
-    private Float porcaoReferencia;
+    private Double porcaoReferencia;
 
     @Column(nullable = false)
-    private Float proteinas;
+    private Double proteinas;
 
     @Column(nullable = false)
-    private Float carboidratos;
+    private Double carboidratos;
 
     @Column(nullable = false)
-    private Float calorias;
+    private Double calorias;
 
     @Column(name = "gorduras_totais", nullable = false)
-    private Float gordurasTotais;
+    private Double gordurasTotais;
 
     @OneToMany(mappedBy = "produto", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Ingrediente> ingredientes;
@@ -69,43 +69,43 @@ public class Produto {
         this.nome = nome;
     }
 
-    public Float getPorcaoReferencia() {
+    public Double getPorcaoReferencia() {
         return porcaoReferencia;
     }
 
-    public void setPorcaoReferencia(Float porcaoReferencia) {
+    public void setPorcaoReferencia(Double porcaoReferencia) {
         this.porcaoReferencia = porcaoReferencia;
     }
 
-    public Float getProteinas() {
+    public Double getProteinas() {
         return proteinas;
     }
 
-    public void setProteinas(Float proteinas) {
+    public void setProteinas(Double proteinas) {
         this.proteinas = proteinas;
     }
 
-    public Float getCarboidratos() {
+    public Double getCarboidratos() {
         return carboidratos;
     }
 
-    public void setCarboidratos(Float carboidratos) {
+    public void setCarboidratos(Double carboidratos) {
         this.carboidratos = carboidratos;
     }
 
-    public Float getCalorias() {
+    public Double getCalorias() {
         return calorias;
     }
 
-    public void setCalorias(Float calorias) {
+    public void setCalorias(Double calorias) {
         this.calorias = calorias;
     }
 
-    public Float getGordurasTotais() {
+    public Double getGordurasTotais() {
         return gordurasTotais;
     }
 
-    public void setGordurasTotais(Float gordurasTotais) {
+    public void setGordurasTotais(Double gordurasTotais) {
         this.gordurasTotais = gordurasTotais;
     }
 

@@ -1,11 +1,13 @@
 package com.mycompany.Minha_despensa_Web.services;
 
+import com.mycompany.Minha_despensa_Web.entities.DTO.IngredienteDTO;
+import com.mycompany.Minha_despensa_Web.entities.DTO.ReceitaDTO;
 import com.mycompany.Minha_despensa_Web.entities.Ingrediente;
 import com.mycompany.Minha_despensa_Web.entities.Produto;
 import com.mycompany.Minha_despensa_Web.entities.Receita;
-import com.mycompany.Minha_despensa_Web.repositories.ProdutoRepository;
 import com.mycompany.Minha_despensa_Web.repositories.ReceitaRepository;
 import java.util.List;
+import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -16,18 +18,21 @@ public class ReceitaService {
     private ReceitaRepository receitaRepository;
 
     @Autowired
-    private ProdutoRepository produtoRepository;
+    private ProdutoService produtoService;
 
-    public Receita salvarReceita(Receita receita) {
+    public Receita salvarReceitaComIngredientes(Receita receita) {
         for (Ingrediente ingrediente : receita.getIngredientes()) {
-            // Valida se o produto existe e associa ao ingrediente
-            if (ingrediente.getProduto() == null || ingrediente.getProduto().getId() == null) {
-                throw new RuntimeException("Produto não informado para o ingrediente.");
+            Long produtoId = ingrediente.getProduto().getId();
+
+            Produto produto = produtoService.findById(produtoId);
+            if (produto == null) {
+                throw new IllegalArgumentException("Produto não encontrado para o ID: " + produtoId);
             }
-            Produto produto = produtoRepository.findById(ingrediente.getProduto().getId())
-                .orElseThrow(() -> new RuntimeException("Produto não encontrado: " + ingrediente.getProduto().getId()));
+
             ingrediente.setProduto(produto);
+            ingrediente.setReceita(receita);
         }
+
         return receitaRepository.save(receita);
     }
 
@@ -41,5 +46,20 @@ public class ReceitaService {
 
     public List<Receita> listarTodas() {
         return receitaRepository.findAll();
+    }
+
+    public ReceitaDTO findReceitaById(Long id) {
+        Receita receita = receitaRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Receita não encontrada"));
+
+        List<ReceitaDTO.IngredienteDTO> ingredientes = receita.getIngredientes().stream()
+                .map(ing -> new ReceitaDTO.IngredienteDTO(
+                ing.getProduto().getId(),
+                ing.getProduto().getNome(),
+                ing.getQuantidade()
+        ))
+                .collect(Collectors.toList());
+
+        return new ReceitaDTO(receita.getId(), receita.getNome(), receita.getModoPreparo(), ingredientes);
     }
 }

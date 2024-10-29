@@ -123,7 +123,7 @@
                     <div style="max-height: 450px; overflow-y: auto;">
                         <table>
                             <tbody>
-                                <tr th:each="receita : ${receitas}" onclick="showReceita([[${receita.id}]])" style="cursor: pointer;">
+                                <tr th:each="receita : ${receitas}" th:onclick="|showReceita(${receita.id})|" style="cursor: pointer;">
                                     <td th:text="${receita.nome}"></td>
                                 </tr>
                             </tbody>
@@ -151,5 +151,28 @@
                 <span>g</span>
             </div>
         </div>
+        <div id="edit-popup" style="display: none;">
+            <label for="edit-nome-receita">Nome da Receita:</label>
+            <input type="text" id="edit-nome-receita">
+            <label for="edit-modo-preparo">Modo de Preparo:</label>
+            <textarea id="edit-modo-preparo"></textarea>
+
+            <div id="edit-ingredientes-container">
+                <!-- Ingredientes da receita editável irão aqui -->
+            </div>
+
+            <button onclick="saveReceitaEdits()">Salvar</button>
+            <button onclick="closeEditPopup()">Cancelar</button>
+        </div>
+        <template id="ingrediente-template">
+            <div class="edit-ingrediente-row">
+                <select class="produto-select">
+                    <option value="{{produtoId}}">Produto</option>
+                    <!-- Outras opções podem ser adicionadas aqui dinamicamente -->
+                </select>
+                <input type="number" value="{{quantidade}}" class="quantidade-input">
+            </div>
+        </template>
+
     </body>
 </html>

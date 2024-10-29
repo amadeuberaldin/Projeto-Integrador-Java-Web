@@ -21,7 +21,7 @@ public class SecurityConfig {
                 .csrfTokenRepository(csrfTokenRepository)
                 )
                 .authorizeHttpRequests((requests) -> requests
-                .requestMatchers("/login", "/register", "/usuario/cadastro", "/usuario/salvar", "/estilo.css", "/favicon.ico", "/Script.js").permitAll()
+                .requestMatchers("/login", "/register", "/produtos/*", "/usuario/cadastro", "/usuario/salvar", "/estilo.css", "/favicon.ico", "/Script.js").permitAll()
                 .anyRequest().authenticated()
                 )
                 .formLogin((form) -> form

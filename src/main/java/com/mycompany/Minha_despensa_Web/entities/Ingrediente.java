@@ -23,7 +23,7 @@ public class Ingrediente {
     @JoinColumn(name = "produto_id", nullable = false)
     private Produto produto;
 
-    private Float quantidade;
+    private Double quantidade;
 
     public Receita getReceita() {
         return receita;
@@ -41,11 +41,11 @@ public class Ingrediente {
         this.produto = produto;
     }
 
-    public Float getQuantidade() {
+    public Double getQuantidade() {
         return quantidade;
     }
 
-    public void setQuantidade(Float quantidade) {
+    public void setQuantidade(Double quantidade) {
         this.quantidade = quantidade;
     }
 }

@@ -1,5 +1,6 @@
 package com.mycompany.Minha_despensa_Web.controllers;
 
+import com.mycompany.Minha_despensa_Web.entities.DTO.ReceitaDTO;
 import com.mycompany.Minha_despensa_Web.entities.Receita;
 import com.mycompany.Minha_despensa_Web.entities.Usuario;
 import com.mycompany.Minha_despensa_Web.services.ReceitaService;
@@ -46,5 +47,11 @@ public class ReceitaController {
     public ResponseEntity<Void> deletarReceita(@PathVariable Long id) {
         receitaService.deletarReceita(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<ReceitaDTO> getReceitaById(@PathVariable Long id) {
+        ReceitaDTO receita = receitaService.findReceitaById(id);
+        return ResponseEntity.ok(receita);
     }
 }
