@@ -1,12 +1,12 @@
 package com.mycompany.Minha_despensa_Web.services;
 
-import com.mycompany.Minha_despensa_Web.entities.DTO.IngredienteDTO;
 import com.mycompany.Minha_despensa_Web.entities.DTO.ReceitaDTO;
 import com.mycompany.Minha_despensa_Web.entities.Ingrediente;
 import com.mycompany.Minha_despensa_Web.entities.Produto;
 import com.mycompany.Minha_despensa_Web.entities.Receita;
 import com.mycompany.Minha_despensa_Web.repositories.ReceitaRepository;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -61,5 +61,16 @@ public class ReceitaService {
                 .collect(Collectors.toList());
 
         return new ReceitaDTO(receita.getId(), receita.getNome(), receita.getModoPreparo(), ingredientes);
+    }
+
+    // Método para encontrar uma receita por ID
+    public Receita findById(Long id) {
+        Optional<Receita> receitaOptional = receitaRepository.findById(id);
+        return receitaOptional.orElse(null);
+    }
+
+    public Receita salvar(Receita receita) {
+        receita.getIngredientes().forEach(ingrediente -> ingrediente.setReceita(receita)); 
+        return receitaRepository.save(receita);
     }
 }

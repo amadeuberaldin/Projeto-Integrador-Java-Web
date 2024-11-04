@@ -3,8 +3,8 @@
     <head>
         <meta charset="UTF-8">
         <title>Painel - Minha Despensa</title>
-        <link rel="icon" th:href="@{/favicon.ico}" type="image/x-icon">
         <link rel="stylesheet" th:href="@{/estilo.css}">
+        <link rel="icon" th:href="@{/favicon.ico}" type="image/x-icon">
         <script src="https://cdn.jsdelivr.net/npm/whatwg-fetch@3.6.2/dist/fetch.umd.js"></script>
         <script th:src="@{/Script.js}"></script>
         <meta name="_csrf" th:content="${_csrf.token}">
@@ -151,28 +151,39 @@
                 <span>g</span>
             </div>
         </div>
-        <div id="edit-popup" style="display: none;">
+        <!-- Popup de edição de receita -->
+        <div id="edit-popup-receita">
             <label for="edit-nome-receita">Nome da Receita:</label>
             <input type="text" id="edit-nome-receita">
+
             <label for="edit-modo-preparo">Modo de Preparo:</label>
             <textarea id="edit-modo-preparo"></textarea>
 
+            <!-- Container onde os ingredientes serão adicionados -->
             <div id="edit-ingredientes-container">
-                <!-- Ingredientes da receita editável irão aqui -->
+                <!-- Ingredientes da receita editável serão inseridos aqui -->
             </div>
 
+            <!-- Botão para adicionar novos ingredientes -->
+            <button type="button" onclick="addIngredientField()">Adicionar Ingrediente</button>
+
             <button onclick="saveReceitaEdits()">Salvar</button>
-            <button onclick="closeEditPopup()">Cancelar</button>
+            <button onclick="closeEditPopupReceita()">Cancelar</button>
         </div>
+
+        <!-- Template de ingrediente para adicionar dinamicamente -->
         <template id="ingrediente-template">
             <div class="edit-ingrediente-row">
                 <select class="produto-select">
+                    <option value="">Selecione um produto</option>
                     <option value="{{produtoId}}">Produto</option>
-                    <!-- Outras opções podem ser adicionadas aqui dinamicamente -->
+                    <!-- Outras opções podem ser carregadas dinamicamente aqui -->
                 </select>
-                <input type="number" value="{{quantidade}}" class="quantidade-input">
+                <input type="number" value="{{quantidade}}" class="quantidade-input" placeholder="Quantidade">
+                <span>g</span>
             </div>
         </template>
+
 
     </body>
 </html>

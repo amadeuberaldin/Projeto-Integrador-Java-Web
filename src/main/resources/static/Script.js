@@ -78,7 +78,7 @@ function closeEditPopup() {
     document.getElementById('edit-popup').style.display = 'none';
 }
 
-// Função para mostrar os detalhes de uma receita, simplificada
+// Função para mostrar os detalhes de uma receita e botões de edição/exclusão
 function showReceita(id) {
     fetch(`/receitas/${id}`)
             .then(response => {
@@ -90,12 +90,10 @@ function showReceita(id) {
             .then(data => {
                 let ingredientes = '';
 
-                // Adicionar ingredientes com suas quantidades
                 data.ingredientes.forEach(ing => {
                     ingredientes += `<li>${ing.produtoNome}: ${ing.quantidade}g</li>`;
                 });
 
-                // Exibir as informações da receita no formato desejado
                 document.querySelector("#receita-detalhes").innerHTML = `
                 <h3>Informações da Receita</h3>
                 <p><strong>Nome:</strong> ${data.nome}</p>
@@ -103,51 +101,59 @@ function showReceita(id) {
                 <ul>${ingredientes}</ul>
                 <p><strong>Modo de Preparo:</strong></p>
                 <p>${data.modoPreparo}</p>
-                <button onclick="deleteReceita(${data.id})">Excluir</button>
+                <button onclick="openEditPopupReceita(${data.id})">Editar</button>
+                <button onclick="deleteReceita(${data.id})" style="margin-left: 10px;">Excluir</button>
             `;
             })
             .catch(error => console.error("Erro ao carregar receita:", error));
 }
 
-
-
-
-// Função para abrir o popup de edição de receita
-function editReceita(id) {
+// Função para abrir o pop-up de edição de receita e preencher os campos com os dados da receita
+function openEditPopupReceita(id) {
     fetch(`/receitas/${id}`)
             .then(response => response.json())
             .then(data => {
                 document.getElementById('edit-nome-receita').value = data.nome;
                 document.getElementById('edit-modo-preparo').value = data.modoPreparo;
+
                 const ingredientesContainer = document.getElementById('edit-ingredientes-container');
                 ingredientesContainer.innerHTML = ''; // Limpa os ingredientes anteriores
 
-                data.ingredientes.forEach((ing, index) => {
-                    const template = document.getElementById('ingrediente-template').innerHTML;
-                    const newIngredientHTML = template
-                            .replace(/INDEX/g, index)
-                            .replace(/{{produtoId}}/g, ing.produto.id)
-                            .replace(/{{quantidade}}/g, ing.quantidade);
-                    ingredientesContainer.insertAdjacentHTML('beforeend', newIngredientHTML);
+                data.ingredientes.forEach(ing => {
+                    addIngredientField(ing.produtoId, ing.quantidade); // Adiciona cada ingrediente já preenchido
                 });
 
-                document.getElementById('edit-popup').style.display = 'block';
-                document.getElementById('edit-popup').dataset.receitaId = id;
+                document.getElementById('edit-popup-receita').style.display = 'block';
+                document.getElementById('edit-popup-receita').dataset.receitaId = id;
             })
             .catch(error => console.error("Erro ao abrir o popup de edição:", error));
 }
 
+// Função para adicionar um novo campo de ingrediente
+function addIngredientField(produtoId = '', quantidade = '') {
+    const template = document.getElementById('ingrediente-template').innerHTML;
+
+    // Substitui placeholders com valores, se fornecidos
+    const newIngredientHTML = template
+            .replace(/{{produtoId}}/g, produtoId)
+            .replace(/{{quantidade}}/g, quantidade);
+
+    document.getElementById('edit-ingredientes-container').insertAdjacentHTML('beforeend', newIngredientHTML);
+}
+
 // Função para salvar as edições da receita
 async function saveReceitaEdits() {
-    const id = document.getElementById('edit-popup').dataset.receitaId;
+    const id = document.getElementById('edit-popup-receita').dataset.receitaId;
     const nomeReceita = document.getElementById('edit-nome-receita').value;
     const modoPreparo = document.getElementById('edit-modo-preparo').value;
 
-    // Mapear os ingredientes e filtrar os incompletos
-    const ingredientes = Array.from(document.querySelectorAll('.edit-ingrediente-row')).map(row => ({
-            produto: {id: row.querySelector('.produto-select').value},
-            quantidade: row.querySelector('input[type="number"]').value
-        })).filter(ing => ing.produto.id && ing.quantidade);
+    // Mapear os ingredientes e filtrar os que estão incompletos
+    const ingredientes = Array.from(document.querySelectorAll('.ingrediente-row'))
+            .map(row => ({
+                    produto: {id: row.querySelector('.produto-select').value},
+                    quantidade: row.querySelector('input[type="number"]').value
+                }))
+            .filter(ingrediente => ingrediente.produto.id && ingrediente.quantidade); // Filtrar ingredientes com id e quantidade não vazios
 
     const receitaData = {
         nome: nomeReceita,
@@ -155,28 +161,33 @@ async function saveReceitaEdits() {
         ingredientes: ingredientes
     };
 
+    const csrfToken = document.querySelector('meta[name="_csrf"]').getAttribute("content");
+    const csrfHeader = document.querySelector('meta[name="_csrf_header"]').getAttribute("content");
+
     try {
         const response = await fetch(`/receitas/${id}`, {
             method: 'PUT',
-            headers: {'Content-Type': 'application/json'},
+            headers: {
+                'Content-Type': 'application/json',
+                [csrfHeader]: csrfToken
+            },
             body: JSON.stringify(receitaData)
         });
 
         if (response.ok) {
-            alert("Receita atualizada com sucesso!");
-            closeEditPopup();
+            alert("Receita editada com sucesso!");
             window.location.reload();
         } else {
-            throw new Error("Erro ao atualizar a receita.");
+            throw new Error("Erro ao editar a receita.");
         }
     } catch (error) {
-        alert("Erro ao salvar as alterações: " + error.message);
+        alert("Erro ao editar a receita: " + error.message);
     }
 }
 
-// Função para fechar o popup de edição
-function closeEditPopup() {
-    document.getElementById('edit-popup').style.display = 'none';
+// Função para fechar o pop-up de edição de receita
+function closeEditPopupReceita() {
+    document.getElementById('edit-popup-receita').style.display = 'none';
 }
 
 // Função para excluir um produto

@@ -13,9 +13,10 @@ public interface ProdutoRepository extends JpaRepository<Produto, Long> {
 
     List<Produto> findByNomeContaining(String nome);
 
-    @Query("SELECT p.id as id, p.nome as nome, p.porcaoReferencia as porcaoReferencia, "
-            + "p.proteinas as proteinas, p.carboidratos as carboidratos, "
-            + "p.calorias as calorias, p.gordurasTotais as gordurasTotais "
-            + "FROM Produto p WHERE p.id = :id")
+
+    @Query("SELECT p.id AS id, p.nome AS nome, p.porcaoReferencia AS porcaoReferencia, " +
+           "p.proteinas AS proteinas, p.carboidratos AS carboidratos, " +
+           "p.calorias AS calorias, p.gordurasTotais AS gordurasTotais " +
+           "FROM Produto p WHERE p.id = :id")
     ProdutoProjection findProdutoById(@Param("id") Long id);
 }
